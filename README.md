@@ -24,6 +24,7 @@ Chrome Extension, TypeScript and Visual Studio Code
     * content script
     * count up badge number
     * background
+* @hello-pangea/dnd (Drag and Drop library)
 
 ## Project Structure
 

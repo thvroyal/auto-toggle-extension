@@ -1,0 +1,1 @@
+always try to use full power of shadcn/ui components, if component not installed, let install it first, split the components into smaller ones if needed
