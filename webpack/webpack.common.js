@@ -5,7 +5,7 @@ const srcDir = path.join(__dirname, "..", "src");
 
 module.exports = {
     entry: {
-      popup: path.join(srcDir, 'popup.tsx'),
+      popup: [path.join(srcDir, 'popup.tsx'), path.join(srcDir, 'styles.css')],
       options: path.join(srcDir, 'options.tsx'),
       background: path.join(srcDir, 'background.ts'),
       content_script: path.join(srcDir, 'content_script.tsx'),
@@ -29,10 +29,14 @@ module.exports = {
                 use: "ts-loader",
                 exclude: /node_modules/,
             },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
+            },
         ],
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js", ".css"],
     },
     plugins: [
         new CopyPlugin({

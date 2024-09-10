@@ -1,51 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { Button } from "./components/ui/button";
+import "./styles.css";
+
+interface Extension {
+  id: string;
+  name: string;
+  enabled: boolean;
+}
 
 const Popup = () => {
-  const [count, setCount] = useState(0);
-  const [currentURL, setCurrentURL] = useState<string>();
+  const [extensions, setExtensions] = useState<Extension[]>([]);
 
   useEffect(() => {
-    chrome.action.setBadgeText({ text: count.toString() });
-  }, [count]);
-
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      setCurrentURL(tabs[0].url);
+    chrome.management.getAll((result) => {
+      const filteredExtensions = result
+        .filter((ext) => ext.type === "extension" && ext.id !== chrome.runtime.id)
+        .map((ext) => ({
+          id: ext.id,
+          name: ext.name,
+          enabled: ext.enabled,
+        }));
+      setExtensions(filteredExtensions);
     });
   }, []);
 
-  const changeBackground = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tab = tabs[0];
-      if (tab.id) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          {
-            color: "#555555",
-          },
-          (msg) => {
-            console.log("result message:", msg);
-          }
-        );
-      }
+  const toggleExtension = (id: string, enabled: boolean) => {
+    chrome.management.setEnabled(id, !enabled, () => {
+      setExtensions((prevExtensions) =>
+        prevExtensions.map((ext) =>
+          ext.id === id ? { ...ext, enabled: !enabled } : ext
+        )
+      );
     });
   };
 
   return (
-    <>
-      <ul style={{ minWidth: "700px" }}>
-        <li>Current URL: {currentURL}</li>
-        <li>Current Time: {new Date().toLocaleTimeString()}</li>
+    <div className="p-6 bg-gray-100 min-w-[400px] max-h-[600px] overflow-y-auto">
+      <h1 className="text-2xl font-bold mb-6">Installed Extensions</h1>
+      <ul className="space-y-3">
+        {extensions.map((ext) => (
+          <li
+            key={ext.id}
+            className="flex items-center justify-between bg-white p-4 rounded-lg shadow"
+          >
+            <span className="font-medium">{ext.name}</span>
+            <Button
+              onClick={() => toggleExtension(ext.id, ext.enabled)}
+              variant={ext.enabled ? "destructive" : "default"}
+              size="sm"
+            >
+              {ext.enabled ? "Disable" : "Enable"}
+            </Button>
+          </li>
+        ))}
       </ul>
-      <button
-        onClick={() => setCount(count + 1)}
-        style={{ marginRight: "5px" }}
-      >
-        count up
-      </button>
-      <button onClick={changeBackground}>change background</button>
-    </>
+    </div>
   );
 };
 
