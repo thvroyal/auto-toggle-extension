@@ -1,8 +1,8 @@
 # Auto Toggle Extensions
 
-![image]("./public/icon128.png")
+![Auto Toggle Extensions Logo](https://raw.githubusercontent.com/thvroyal/chrome-extension-grouping/main/public/icon128.png)
 
-A Chrome extension to boost productivity by managing and organizing browser extensions.
+**A Chrome extension to boost productivity by managing and organizing browser extensions.**
 
 ## Features
 
