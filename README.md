@@ -1,71 +1,74 @@
-# Chrome Extension TypeScript Starter
+# Auto Toggle Extensions
 
-![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
+![image]("./public/icon128.png")
 
-Chrome Extension, TypeScript and Visual Studio Code
+A Chrome extension to boost productivity by managing and organizing browser extensions.
 
-## Prerequisites
+## Features
 
-* [node + npm](https://nodejs.org/) (Current Version)
+- Group extensions for easy management
+- Toggle extensions on/off with a single click
+- Create custom groups for different workflows
+- Intuitive user interface with drag-and-drop functionality
 
-## Option
+## Tech Stack
 
-* [Visual Studio Code](https://code.visualstudio.com/)
-
-## Includes the following
-
-* TypeScript
-* Webpack
-* React
-* Jest
-* Example Code
-    * Chrome Storage
-    * Options Version 2
-    * content script
-    * count up badge number
-    * background
-* @hello-pangea/dnd (Drag and Drop library)
+- TypeScript
+- React
+- Webpack
+- Tailwind CSS
+- shadcn/ui components
 
 ## Project Structure
 
-* src/typescript: TypeScript source files
-* src/assets: static files
-* dist: Chrome Extension directory
-* dist/js: Generated JavaScript files
+- `src/`: TypeScript source files
+- `public/`: Static files
+- `dist/`: Chrome Extension directory (generated)
 
 ## Setup
 
-```
+1. Clone the repository
+2. Install dependencies:
+
+```bash
 npm install
 ```
 
-## Import as Visual Studio Code project
+## Development
 
-...
+Run the development server:
 
-## Build
-
-```
-npm run build
-```
-
-## Build in watch mode
-
-### terminal
-
-```
+```bash
 npm run watch
 ```
 
-### Visual Studio Code
+## Build
 
-Run watch mode.
+Create a production build:
 
-type `Ctrl + Shift + B`
+```bash
+npm run build
+```
 
-## Load extension to chrome
+## Load Extension in Chrome
 
-Load `dist` directory
+1. Open Chrome and navigate to `chrome://extensions`
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Select the `dist` directory in the project folder
 
-## Test
-`npx jest` or `npm run test`
+## Testing
+
+Run tests:
+
+```bash
+npm run test
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+[MIT License](LICENSE)
