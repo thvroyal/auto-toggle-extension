@@ -6,6 +6,7 @@ import { Checkbox } from "../components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -133,22 +134,25 @@ const Popup: React.FC = () => {
   return (
     <div className="p-6 bg-gray-100 min-w-[400px] max-h-[600px] overflow-y-auto">
       <NewGroupForm onAddGroup={handleAddGroup} />
-      {groups.map((group) => (
-        <GroupCard
-          key={group.id}
-          group={group}
-          extensions={extensions}
-          onRename={openRenameDialog}
-          onDelete={openDeleteDialog}
-          onToggleGroup={toggleGroup}
-          onToggleExtension={handleToggleExtension}
-          getExtensionIcon={getExtensionIcon}
-          onAddExtension={openAddExtensionDialog}
-        />
-      ))}
+      {groups.map((group) => {
+        if (group.id === "all" && group.extensionIds.length === 0) return null;
+        return (
+          <GroupCard
+            key={group.id}
+            group={group}
+            extensions={extensions}
+            onRename={openRenameDialog}
+            onDelete={openDeleteDialog}
+            onToggleGroup={toggleGroup}
+            onToggleExtension={handleToggleExtension}
+            getExtensionIcon={getExtensionIcon}
+            onAddExtension={openAddExtensionDialog}
+          />
+        );
+      })}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent
-          className="max-w-md"
+          className="max-w-sm rounded-lg"
           aria-describedby="dialog-description"
         >
           <DialogHeader>
@@ -160,6 +164,13 @@ const Popup: React.FC = () => {
                 : "Add Extensions"}
             </DialogTitle>
           </DialogHeader>
+          <DialogDescription hidden>
+            {dialogType === "rename"
+              ? "Rename the group to a new name."
+              : dialogType === "delete"
+              ? "Delete the group and all its extensions."
+              : "Add extensions to the group."}
+          </DialogDescription>
           {dialogType === "rename" ? (
             <>
               <Input

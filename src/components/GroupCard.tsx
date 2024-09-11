@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
-import { Edit2, MoreVertical, Trash } from "lucide-react";
+import { Edit2, MoreVertical, Trash, Plus } from "lucide-react";
 import ExtensionCard from "./ExtensionCard";
 import { Group, Extension } from "../types";
 import {
@@ -11,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Plus } from "lucide-react";
 
 interface GroupCardProps {
   group: Group;
@@ -34,6 +33,21 @@ const GroupCard: React.FC<GroupCardProps> = ({
   getExtensionIcon,
   onAddExtension,
 }) => {
+  const menuItems = [
+    {
+      icon: Plus,
+      label: "Add Extension",
+      onClick: () => onAddExtension(group),
+    },
+    { icon: Edit2, label: "Rename", onClick: () => onRename(group) },
+    {
+      icon: Trash,
+      label: "Delete",
+      onClick: () => onDelete(group),
+      className: "text-red-500 hover:!text-red-500",
+    },
+  ];
+
   return (
     <Card key={group.id} className="mb-4">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -47,18 +61,16 @@ const GroupCard: React.FC<GroupCardProps> = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => onAddExtension(group)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Extension
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onRename(group)}>
-                  <Edit2 className="mr-2 h-4 w-4" />
-                  Rename
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDelete(group)} className="text-red-500">
-                  <Trash className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
+                {menuItems.map((item, index) => (
+                  <DropdownMenuItem
+                    key={index}
+                    onClick={item.onClick}
+                    className={item.className}
+                  >
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.label}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -89,8 +101,11 @@ const GroupCard: React.FC<GroupCardProps> = ({
               );
             })
           ) : (
-            <div className="col-span-5 p-4 border border-dashed bg-gray-50 rounded-lg text-gray-500 text-center">
-              No extensions in this group
+            <div
+              className="col-span-5 p-4 border border-dashed bg-gray-50 rounded-lg text-gray-500 text-center"
+              onClick={() => onAddExtension(group)}
+            >
+              Click to add extensions
             </div>
           )}
         </div>
