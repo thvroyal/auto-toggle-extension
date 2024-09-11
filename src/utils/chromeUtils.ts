@@ -16,7 +16,6 @@ export const toggleExtension = (
   enabled: boolean,
   callback: () => void
 ) => {
-  console.log("toggleExtension", id, enabled);
   chrome.management.setEnabled(id, enabled, callback);
 };
 

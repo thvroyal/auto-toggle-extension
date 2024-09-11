@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { Group } from "../types";
+import { useEffect, useState } from "react";
 import { ChromeStorageManager } from "../lib/ChromeStorageManager";
+import { Group } from "../types";
 
 export const useGroups = (extensions: chrome.management.ExtensionInfo[]) => {
   const [groups, setGroups] = useState<Group[]>([
@@ -27,6 +27,18 @@ export const useGroups = (extensions: chrome.management.ExtensionInfo[]) => {
   }, [extensions]);
 
   const updateGroups = async (newGroups: Group[]) => {
+    const allGroup = newGroups.find(group => group.id === "all");
+    if (allGroup) {
+      const extensionsInOtherGroups = new Set(
+        newGroups
+          .filter(group => group.id !== "all")
+          .flatMap(group => group.extensionIds)
+      );
+      allGroup.extensionIds = extensions.filter(
+        ext => !extensionsInOtherGroups.has(ext.id)
+      ).map(ext => ext.id);
+    }
+
     setGroups(newGroups);
     await ChromeStorageManager.set("groups", newGroups);
   };

@@ -1,21 +1,31 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../components/ui/dialog";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
 import GroupCard from "../components/GroupCard";
 import NewGroupForm from "../components/NewGroupForm";
+import { Button } from "../components/ui/button";
+import { Checkbox } from "../components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
 import { useExtensions } from "../hooks/useExtensions";
 import { useGroups } from "../hooks/useGroups";
-import { getExtensionIcon } from "../utils/chromeUtils";
 import { Group } from "../types";
+import { getExtensionIcon } from "../utils/chromeUtils";
 
 const Popup: React.FC = () => {
   const { extensions, handleToggleExtension } = useExtensions();
   const { groups, updateGroups } = useGroups(extensions);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState<"rename" | "delete">("rename");
+  const [dialogType, setDialogType] = useState<"rename" | "delete" | "add">(
+    "rename"
+  );
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [newGroupName, setNewGroupName] = useState("");
+  const [selectedExtensions, setSelectedExtensions] = useState<string[]>([]);
 
   const handleAddGroup = (name: string) => {
     const newGroup: Group = {
@@ -39,10 +49,19 @@ const Popup: React.FC = () => {
     setDialogOpen(true);
   };
 
+  const openAddExtensionDialog = (group: Group) => {
+    setSelectedGroup(group);
+    setSelectedExtensions(group.extensionIds);
+    setDialogType("add");
+    setDialogOpen(true);
+  };
+
   const handleRename = () => {
     if (selectedGroup && newGroupName.trim() !== "") {
       const updatedGroups = groups.map((group) =>
-        group.id === selectedGroup.id ? { ...group, name: newGroupName.trim() } : group
+        group.id === selectedGroup.id
+          ? { ...group, name: newGroupName.trim() }
+          : group
       );
       updateGroups(updatedGroups);
       setDialogOpen(false);
@@ -74,9 +93,40 @@ const Popup: React.FC = () => {
   };
 
   const toggleGroup = (groupId: string) => {
-    const group = groups.find(g => g.id === groupId);
+    const group = groups.find((g) => g.id === groupId);
     if (group) {
-      group.extensionIds.forEach(id => handleToggleExtension(id));
+      group.extensionIds.forEach((id) => handleToggleExtension(id));
+    }
+  };
+
+  const isExtensionInOtherGroups = (extId: string) => {
+    return groups.some(
+      (group) =>
+        group.id !== "all" &&
+        group.id !== selectedGroup?.id &&
+        group.extensionIds.includes(extId)
+    );
+  };
+
+  const handleCheckboxChange = (extId: string, checked: boolean) => {
+    setSelectedExtensions((prev) =>
+      checked ? [...prev, extId] : prev.filter((id) => id !== extId)
+    );
+  };
+
+  const handleAddExtensions = () => {
+    if (selectedGroup) {
+      const updatedGroups = groups.map((group) => {
+        if (group.id === selectedGroup.id) {
+          return {
+            ...group,
+            extensionIds: [...selectedExtensions],
+          };
+        }
+        return group;
+      });
+      updateGroups(updatedGroups);
+      setDialogOpen(false);
     }
   };
 
@@ -93,13 +143,21 @@ const Popup: React.FC = () => {
           onToggleGroup={toggleGroup}
           onToggleExtension={handleToggleExtension}
           getExtensionIcon={getExtensionIcon}
+          onAddExtension={openAddExtensionDialog}
         />
       ))}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent
+          className="max-w-md"
+          aria-describedby="dialog-description"
+        >
           <DialogHeader>
             <DialogTitle>
-              {dialogType === "rename" ? "Rename Group" : "Delete Group"}
+              {dialogType === "rename"
+                ? "Rename Group"
+                : dialogType === "delete"
+                ? "Delete Group"
+                : "Add Extensions"}
             </DialogTitle>
           </DialogHeader>
           {dialogType === "rename" ? (
@@ -113,12 +171,50 @@ const Popup: React.FC = () => {
                 <Button onClick={handleRename}>Rename</Button>
               </DialogFooter>
             </>
-          ) : (
+          ) : dialogType === "delete" ? (
             <>
               <p>Are you sure you want to delete this group?</p>
               <DialogFooter>
                 <Button onClick={handleDelete} variant="destructive">
                   Delete
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <div className="max-h-[300px] overflow-y-auto px-2">
+                {extensions.map((ext) => {
+                  const isInOtherGroup = isExtensionInOtherGroups(ext.id);
+                  if (isInOtherGroup) return null;
+                  return (
+                    <div
+                      key={ext.id}
+                      className="flex items-center space-x-2 py-2"
+                    >
+                      <Checkbox
+                        id={ext.id}
+                        checked={selectedExtensions.includes(ext.id)}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange(ext.id, checked as boolean)
+                        }
+                      />
+                      <img
+                        src={getExtensionIcon(ext)}
+                        alt={ext.name}
+                        className="w-4 h-4 mr-2"
+                      />
+                      <label htmlFor={ext.id} className="flex-grow">
+                        {ext.name}
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+              <DialogFooter>
+                <Button onClick={handleAddExtensions}>
+                  {selectedGroup?.id === "all"
+                    ? "Update All Group"
+                    : "Update Group"}
                 </Button>
               </DialogFooter>
             </>

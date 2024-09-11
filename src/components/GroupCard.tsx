@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
-import { MoreVertical } from "lucide-react";
+import { Edit2, MoreVertical, Trash } from "lucide-react";
 import ExtensionCard from "./ExtensionCard";
 import { Group, Extension } from "../types";
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { Plus } from "lucide-react";
 
 interface GroupCardProps {
   group: Group;
@@ -20,6 +21,7 @@ interface GroupCardProps {
   onToggleGroup: (groupId: string, enabled: boolean) => void;
   onToggleExtension: (id: string) => void;
   getExtensionIcon: (extension: Extension) => string | undefined;
+  onAddExtension: (group: Group) => void;
 }
 
 const GroupCard: React.FC<GroupCardProps> = ({
@@ -30,6 +32,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
   onToggleGroup,
   onToggleExtension,
   getExtensionIcon,
+  onAddExtension,
 }) => {
   return (
     <Card key={group.id} className="mb-4">
@@ -44,10 +47,16 @@ const GroupCard: React.FC<GroupCardProps> = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => onRename(group)} inset>
+                <DropdownMenuItem onClick={() => onAddExtension(group)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Extension
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onRename(group)}>
+                  <Edit2 className="mr-2 h-4 w-4" />
                   Rename
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDelete(group)} className="text-red-500" inset>
+                <DropdownMenuItem onClick={() => onDelete(group)} className="text-red-500">
+                  <Trash className="mr-2 h-4 w-4" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
